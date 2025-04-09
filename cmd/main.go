@@ -1,7 +1,8 @@
-package cmd
+package main
 
-import "fmt"
+import "formulink-backend/internal/service"
 
 func main() {
-	fmt.Println("69")
+	svc := service.NewService()
+	svc.StartServer()
 }
