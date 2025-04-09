@@ -1,0 +1,60 @@
+services:
+  postgres:
+    container_name: formulink_postgres_container
+    image: postgres
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: postgres
+    volumes:
+      - ./storage/postgres:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
+    networks:
+      - main-network
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U root -d postgres" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    container_name: formulink_redis_container
+    image: redis
+    volumes:
+      - ./storage/redis:/data
+    ports:
+      - "6379:6379"
+    networks:
+      - main-network
+    healthcheck:
+      test: [ "CMD", "redis-cli", "ping" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  main-service:
+    ports:
+      - "8081:8081"
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: formulink_server_container
+    depends_on:
+      redis:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8081"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+
+networks:
+  main-network:
+    driver: bridge
+    
+    

@@ -9,5 +9,6 @@ func main() {
 	logger.Init()
 
 	svc := service.NewService()
+	svc.ConfigureEcho()
 	svc.StartServer()
 }

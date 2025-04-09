@@ -1,17 +1,21 @@
 package service
 
 import (
+	"formulink-backend/internal/service/handlers"
 	"formulink-backend/pkg/logger"
 	"github.com/labstack/echo/v4"
 	"net/http"
 )
 
 type Service struct {
-	e *echo.Echo
+	e           *echo.Echo
+	authHandler *handlers.AuthHandler
 }
 
 func NewService() *Service {
-	return &Service{}
+	return &Service{
+		authHandler: handlers.NewAuthHandler(),
+	}
 }
 
 func (s *Service) ConfigureEcho() {
