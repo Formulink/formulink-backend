@@ -1,14 +1,13 @@
 package main
 
 import (
-	"formulink-backend/internal/service"
+	"formulink-backend/internal"
 	"formulink-backend/pkg/logger"
 )
 
 func main() {
 	logger.Init()
 
-	svc := service.NewService()
-	svc.ConfigureEcho()
-	svc.StartServer()
+	server := internal.NewServer()
+	server.Start()
 }
