@@ -31,7 +31,7 @@ func configureServer(s *Server) {
 	//sections
 	e.GET("/sections", s.service.GetSections)
 	e.GET("/:subject/sections", s.service.GetSectionsBySubjectId)
-	e.GET("/subject", s.service.GetSubjects)
+	e.GET("/subjects", s.service.GetSubjects)
 
 	//formulas
 	e.GET("/:id/formulas", s.service.GetFormulaByFormulaId)

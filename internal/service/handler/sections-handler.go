@@ -85,7 +85,7 @@ func (sh *SectionHandler) GetSubjects(c echo.Context) error {
 
 	for rows.Next() {
 		var subject model.Subject
-		err = rows.Scan(&subject)
+		err = rows.Scan(&subject.Id, &subject.Name)
 		if err != nil {
 			logger.Lg().Logf(zapcore.InfoLevel, "err: %v", err)
 			return err
