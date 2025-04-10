@@ -1,24 +1,32 @@
 package handler
 
 import (
+	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
 	"formulink-backend/internal/model"
 	"formulink-backend/pkg/logger"
+	"formulink-backend/pkg/utils"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/lib/pq"
+	"github.com/redis/go-redis/v9"
+	"go.uber.org/zap/zapcore"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type FormulaHandler struct {
-	db *sql.DB
+	db    *sql.DB
+	redis *redis.Client
 }
 
-func NewFormulaHandler(_db *sql.DB) *FormulaHandler {
+func NewFormulaHandler(_db *sql.DB, _redis *redis.Client) *FormulaHandler {
 	return &FormulaHandler{
-		db: _db,
+		db:    _db,
+		redis: _redis,
 	}
 }
 
@@ -87,4 +95,68 @@ func (fh *FormulaHandler) GetFormulaById(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, formula)
+}
+
+func (fh *FormulaHandler) GetFormulaOfTheDay(c echo.Context) error {
+	ctx := context.TODO()
+	v, err := utils.Parse(fh.redis.Get(ctx, "fday").Bytes())
+	if err != nil {
+		if errors.Is(err, redis.Nil) {
+			err = fh.setRandomFormula()
+			if err != nil {
+				logger.Lg().Logf(zapcore.InfoLevel, "error: %v", err)
+				return c.JSON(http.StatusInternalServerError, ":(")
+			}
+
+			v, err = utils.Parse(fh.redis.Get(ctx, "fday").Bytes())
+			if err != nil {
+				logger.Lg().Logf(zapcore.InfoLevel, "error: %v", err)
+				return c.JSON(http.StatusInternalServerError, "item hasn't been updated in redis")
+			}
+			return c.JSON(http.StatusOK, v)
+		} else {
+			logger.Lg().Logf(zapcore.InfoLevel, "error: %v", err)
+			return c.JSON(http.StatusInternalServerError, ":(")
+		}
+	}
+
+	logger.Lg().Logf(zapcore.InfoLevel, "item exists in redis %v", v)
+	return c.JSON(http.StatusOK, v)
+}
+
+func (fh *FormulaHandler) setRandomFormula() error {
+	var formula model.Formula
+
+	query := `SELECT id, section_id, name, description, expression, parameters, difficulty 
+          FROM formulas 
+          ORDER BY RANDOM() 
+          LIMIT 1`
+
+	row := fh.db.QueryRow(query)
+	err := row.Scan(
+		&formula.Id,
+		&formula.SectionId,
+		&formula.Name,
+		&formula.Description,
+		&formula.Expression,
+		pq.Array(&formula.Parameters),
+		&formula.Difficulty,
+	)
+	if err != nil {
+		logger.Lg().Logf(zapcore.InfoLevel, "problem is here (get rows)")
+		return err
+	}
+
+	fjson, err := json.Marshal(formula)
+	if err != nil {
+		return err
+	}
+	ctx := context.TODO()
+	err = fh.redis.Set(ctx, "fday", fjson, time.Hour*24).Err()
+	if err != nil {
+		logger.Lg().Logf(zapcore.InfoLevel, "problem is here (set value) %v", err)
+		return err
+	}
+	logger.Lg().Logf(zapcore.InfoLevel, "item succesfully updated in redis")
+	return nil
 }

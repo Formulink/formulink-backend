@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"formulink-backend/internal/service"
 	"github.com/labstack/echo/v4"
+	"github.com/redis/go-redis/v9"
 )
 
 type Server struct {
@@ -11,9 +12,9 @@ type Server struct {
 	service *service.Service
 }
 
-func NewServer(db *sql.DB) *Server {
+func NewServer(db *sql.DB, redis *redis.Client) *Server {
 	server := &Server{
-		service: service.NewService(db),
+		service: service.NewService(db, redis),
 	}
 	configureServer(server)
 	return server
@@ -32,6 +33,7 @@ func configureServer(s *Server) {
 	//formulas
 	e.GET("/:id/formulas", s.service.GetFormulaByFormulaId)
 	e.GET("/formulas/:id", s.service.GetFormulaById)
+	e.GET("/formulas/fday", s.service.GetFormulaOfTheDay)
 	s.e = e
 }
 

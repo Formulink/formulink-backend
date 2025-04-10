@@ -5,17 +5,20 @@ import (
 	"formulink-backend/internal/model"
 	"formulink-backend/pkg/logger"
 	"github.com/labstack/echo/v4"
+	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap/zapcore"
 	"net/http"
 )
 
 type SectionHandler struct {
-	db *sql.DB
+	db    *sql.DB
+	redis *redis.Client
 }
 
-func NewSectionHandler(_db *sql.DB) *SectionHandler {
+func NewSectionHandler(_db *sql.DB, _redis *redis.Client) *SectionHandler {
 	return &SectionHandler{
-		db: _db,
+		db:    _db,
+		redis: _redis,
 	}
 }
 

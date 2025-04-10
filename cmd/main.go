@@ -4,6 +4,7 @@ import (
 	"formulink-backend/internal"
 	"formulink-backend/internal/config"
 	"formulink-backend/pkg/db/postgres"
+	"formulink-backend/pkg/db/redis"
 	"formulink-backend/pkg/logger"
 )
 
@@ -16,7 +17,8 @@ func main() {
 	}
 
 	pgConn, err := postgres.NewPostgres(cfg.POSTGRES)
+	redisClient := redis.NewRedisConn(cfg.REDIS)
 
-	server := internal.NewServer(pgConn)
+	server := internal.NewServer(pgConn, redisClient)
 	server.Start()
 }
