@@ -22,7 +22,16 @@ func NewServer(db *sql.DB) *Server {
 func configureServer(s *Server) {
 	e := echo.New()
 	e.GET("/", s.service.Hello)
+
+	//auth
 	e.GET("/auth", s.service.Auth)
+
+	//sections
+	e.GET("/sections", s.service.GetSections)
+
+	//formulas
+	e.GET("/:id/formulas", s.service.GetFormulaByFormulaId)
+	e.GET("/formulas/:id", s.service.GetFormulaById)
 	s.e = e
 }
 
