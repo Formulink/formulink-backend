@@ -18,7 +18,7 @@ func NewService(db *sql.DB) *Service {
 }
 
 func (s *Service) Auth(c echo.Context) error {
-	return s.authHandler.CreateUser(c)
+	return s.authHandler.Auth(c)
 }
 
 func (s *Service) Hello(ctx echo.Context) error {
