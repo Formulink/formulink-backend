@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"formulink-backend/internal/service"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"github.com/redis/go-redis/v9"
 )
 
@@ -29,11 +30,24 @@ func configureServer(s *Server) {
 
 	//sections
 	e.GET("/sections", s.service.GetSections)
+	e.GET("/:subject/sections", s.service.GetSectionsBySubjectId)
+	e.GET("/subject", s.service.GetSubjects)
 
 	//formulas
 	e.GET("/:id/formulas", s.service.GetFormulaByFormulaId)
 	e.GET("/formulas/:id", s.service.GetFormulaById)
 	e.GET("/formulas/fday", s.service.GetFormulaOfTheDay)
+
+	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
+		AllowOrigins: []string{
+			"http://localhost:5173",
+			"https://localhost:5173",
+			"http://localhost:5174",
+			"https://localhost:5174",
+		},
+		AllowHeaders: []string{"*"},
+	}))
+
 	s.e = e
 }
 

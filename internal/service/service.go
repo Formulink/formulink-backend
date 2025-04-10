@@ -36,6 +36,14 @@ func (s *Service) GetSections(c echo.Context) error {
 	return s.sectionHandler.GetSections(c)
 }
 
+func (s *Service) GetSectionsBySubjectId(c echo.Context) error {
+	return s.sectionHandler.GetSectionsBySubjectId(c)
+}
+
+func (s *Service) GetSubjects(c echo.Context) error {
+	return s.sectionHandler.GetSubjects(c)
+}
+
 // formula functions
 func (s *Service) GetFormulaByFormulaId(c echo.Context) error {
 	return s.formulaHandler.GetFormulasBySectionId(c)

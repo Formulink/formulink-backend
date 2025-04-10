@@ -14,6 +14,6 @@ WORKDIR /app
 
 COPY --from=builder /service ./
 
-EXPOSE 8081
+EXPOSE 8080
 
 CMD ["./service"]
