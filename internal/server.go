@@ -37,6 +37,7 @@ func configureServer(s *Server) {
 	e.GET("/:id/formulas", s.service.GetFormulaByFormulaId)
 	e.GET("/formulas/:id", s.service.GetFormulaById)
 	e.GET("/formulas/fday", s.service.GetFormulaOfTheDay)
+	e.GET("/formulas/all", s.service.GetAllFormulas)
 
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{

@@ -30,6 +30,54 @@ func NewFormulaHandler(_db *sql.DB, _redis *redis.Client) *FormulaHandler {
 	}
 }
 
+func (fh *FormulaHandler) GetAllFormulas(c echo.Context) error {
+
+	ctx := context.TODO()
+	v, err := utils.Parse(fh.redis.Get(ctx, "fall").Bytes())
+	if err != nil {
+
+		var formulas []model.Formula
+		query := `SELECT * from formulas`
+		rows, err := fh.db.Query(query)
+		if err != nil {
+			return c.JSON(http.StatusInternalServerError, err)
+		}
+
+		for rows.Next() {
+			var formula model.Formula
+			err = rows.Scan(
+				&formula.Id,
+				&formula.SectionId,
+				&formula.Name,
+				&formula.Description,
+				&formula.Expression,
+				pq.Array(&formula.Parameters),
+				&formula.Difficulty,
+			)
+			if err != nil {
+				return c.JSON(http.StatusInternalServerError, err)
+			}
+			formulas = append(formulas, formula)
+		}
+
+		go func() {
+			var bytes []byte
+			if bytes, err = json.Marshal(formulas); err != nil {
+				logger.Lg().Fatalf("failed to marshall formulas | %v", err)
+				return
+			}
+			if err = fh.redis.Set(ctx, "fall", bytes, time.Hour).Err(); err != nil {
+				logger.Lg().Fatalf("failed to cache | %v", err)
+			}
+		}()
+
+		return c.JSON(http.StatusOK, formulas)
+
+	}
+
+	return c.JSON(http.StatusOK, v)
+}
+
 func (fh *FormulaHandler) GetFormulasBySectionId(c echo.Context) error {
 	var formulas []model.Formula
 	id, err := strconv.Atoi(c.Param("id"))
