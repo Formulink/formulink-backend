@@ -64,7 +64,7 @@ func (sh *SectionHandler) GetSectionsBySubjectId(c echo.Context) error {
 
 	for rows.Next() {
 		var section model.Section
-		err = rows.Scan(&section)
+		err = rows.Scan(&section.SubjectId, &section.Name, &section.Description, &section.Id)
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, "can't parse data from db")
 		}
