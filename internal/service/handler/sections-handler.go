@@ -68,6 +68,7 @@ func (sh *SectionHandler) GetSectionsBySubjectId(c echo.Context) error {
 		if err != nil {
 			return c.JSON(http.StatusInternalServerError, "can't parse data from db")
 		}
+
 		sections = append(sections, section)
 	}
 
