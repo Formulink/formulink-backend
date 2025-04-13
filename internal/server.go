@@ -39,6 +39,11 @@ func configureServer(s *Server) {
 	e.GET("/formulas/fday", s.service.GetFormulaOfTheDay)
 	e.GET("/formulas/all", s.service.GetAllFormulas)
 
+	//task
+	e.GET("/tasks/:id", s.service.GetTasksByFormulaId)
+	e.GET("task/:id", s.service.GetTaskById)
+
+	//CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{
 			"http://localhost:5173",

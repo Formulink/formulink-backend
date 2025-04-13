@@ -63,11 +63,9 @@ func (fh *FormulaHandler) GetAllFormulas(c echo.Context) error {
 		go func() {
 			var bytes []byte
 			if bytes, err = json.Marshal(formulas); err != nil {
-				logger.Lg().Fatalf("failed to marshall formulas | %v", err)
 				return
 			}
 			if err = fh.redis.Set(ctx, "fall", bytes, time.Hour).Err(); err != nil {
-				logger.Lg().Fatalf("failed to cache | %v", err)
 			}
 		}()
 
@@ -82,7 +80,6 @@ func (fh *FormulaHandler) GetFormulasBySectionId(c echo.Context) error {
 	var formulas []model.Formula
 	id, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		logger.Lg().Fatalf("can't parse id | err: id is missing")
 		return c.JSON(http.StatusBadRequest, "id is missing")
 	}
 
@@ -103,7 +100,6 @@ func (fh *FormulaHandler) GetFormulasBySectionId(c echo.Context) error {
 			pq.Array(&formula.Parameters),
 			&formula.Difficulty,
 		); err != nil {
-			logger.Lg().Fatalf("can't parse db data to model.Formula | err: %v", err)
 			return c.JSON(http.StatusInternalServerError, "can't parse db data to model.Formula")
 		}
 		formulas = append(formulas, formula)

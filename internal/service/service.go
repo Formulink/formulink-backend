@@ -14,6 +14,7 @@ type Service struct {
 	authHandler    *handler.AuthHandler
 	formulaHandler *handler.FormulaHandler
 	sectionHandler *handler.SectionHandler
+	taskHandler    *handler.TaskHandler
 }
 
 func NewService(db *sql.DB, redis *redis.Client) *Service {
@@ -23,6 +24,7 @@ func NewService(db *sql.DB, redis *redis.Client) *Service {
 		authHandler:    handler.NewAuthHandler(db),
 		formulaHandler: handler.NewFormulaHandler(db, redis),
 		sectionHandler: handler.NewSectionHandler(db, redis),
+		taskHandler:    handler.NewTaskHandler(db, redis),
 	}
 }
 
@@ -59,6 +61,14 @@ func (s *Service) GetFormulaById(c echo.Context) error {
 
 func (s *Service) GetFormulaOfTheDay(c echo.Context) error {
 	return s.formulaHandler.GetFormulaOfTheDay(c)
+}
+
+// tasks
+func (s *Service) GetTasksByFormulaId(c echo.Context) error {
+	return s.taskHandler.GetTasksByFormulaId(c)
+}
+func (s *Service) GetTaskById(c echo.Context) error {
+	return s.taskHandler.GetTaskById(c)
 }
 
 // other

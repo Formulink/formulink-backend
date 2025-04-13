@@ -51,3 +51,14 @@ create table if not exists  formula_likes
 
 );
 
+
+CREATE table if not exists tasks(
+    id uuid primary key,
+    formula_id uuid
+        constraint tasks_formulas_id_fk
+            references formulas(id),
+    difficulty integer,
+    task_text text,
+    result float
+
+);
