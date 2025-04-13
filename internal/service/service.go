@@ -2,6 +2,7 @@ package service
 
 import (
 	"database/sql"
+	"formulink-backend/internal/config"
 	"formulink-backend/internal/service/handler"
 	"github.com/labstack/echo/v4"
 	"github.com/redis/go-redis/v9"
@@ -15,9 +16,10 @@ type Service struct {
 	formulaHandler *handler.FormulaHandler
 	sectionHandler *handler.SectionHandler
 	taskHandler    *handler.TaskHandler
+	mistralHandler *handler.MistralHandler
 }
 
-func NewService(db *sql.DB, redis *redis.Client) *Service {
+func NewService(db *sql.DB, redis *redis.Client, cfg *config.MainConfig) *Service {
 	return &Service{
 		db:             db,
 		redis:          redis,
@@ -25,6 +27,7 @@ func NewService(db *sql.DB, redis *redis.Client) *Service {
 		formulaHandler: handler.NewFormulaHandler(db, redis),
 		sectionHandler: handler.NewSectionHandler(db, redis),
 		taskHandler:    handler.NewTaskHandler(db, redis),
+		mistralHandler: handler.NewMistralHandler(db, redis, cfg.MistralApiKey),
 	}
 }
 
@@ -69,6 +72,11 @@ func (s *Service) GetTasksByFormulaId(c echo.Context) error {
 }
 func (s *Service) GetTaskById(c echo.Context) error {
 	return s.taskHandler.GetTaskById(c)
+}
+
+// neuro
+func (s *Service) MistralChat(c echo.Context) error {
+	return s.mistralHandler.Chat(c)
 }
 
 // other

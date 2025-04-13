@@ -24,6 +24,6 @@ func main() {
 	mistralClient := mistral.CreateMistralClient(cfg.MistralApiKey)
 	fmt.Println(mistralClient)
 
-	server := internal.NewServer(pgConn, redisClient)
+	server := internal.NewServer(pgConn, redisClient, cfg)
 	server.Start()
 }

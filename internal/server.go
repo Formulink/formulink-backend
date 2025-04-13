@@ -2,6 +2,7 @@ package internal
 
 import (
 	"database/sql"
+	"formulink-backend/internal/config"
 	"formulink-backend/internal/service"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
@@ -13,9 +14,9 @@ type Server struct {
 	service *service.Service
 }
 
-func NewServer(db *sql.DB, redis *redis.Client) *Server {
+func NewServer(db *sql.DB, redis *redis.Client, cfg *config.MainConfig) *Server {
 	server := &Server{
-		service: service.NewService(db, redis),
+		service: service.NewService(db, redis, cfg),
 	}
 	configureServer(server)
 	return server
@@ -42,6 +43,9 @@ func configureServer(s *Server) {
 	//task
 	e.GET("/tasks/:id", s.service.GetTasksByFormulaId)
 	e.GET("task/:id", s.service.GetTaskById)
+
+	//neuro
+	e.POST("/ai", s.service.MistralChat)
 
 	//CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
