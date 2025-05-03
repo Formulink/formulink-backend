@@ -36,8 +36,10 @@ var text string = "НА РУССКОМ ЯЗЫКЕ Ты - профессиона�
 
 func (mh *MistralHandler) Chat(c echo.Context) error {
 	var req dto.MistralChatRequest
+	var resp *mistral.ChatCompletionResponse
 
 	err := c.Bind(&req)
+	logger.Lg().Logf(0, "request: %v", c.Request().Body)
 	if err != nil {
 		logger.Lg().Infof("err: %v", err)
 		return c.JSON(http.StatusBadRequest, "err")
@@ -46,16 +48,26 @@ func (mh *MistralHandler) Chat(c echo.Context) error {
 	formula, err := mh.getSingleFormula(req.Task.FormulaId)
 	if err != nil {
 		logger.Lg().Infof("err: %v", err)
-		return c.JSON(http.StatusInternalServerError, err)
 	}
 
-	resp, err := mh.client.Chat("mistral-small", []mistral.ChatMessage{
-		{Role: mistral.RoleSystem, Content: fmt.Sprintf("%s | ЗАДАЧА: %s | НЕОБХОДИМАЯ ФОРМУЛА:  %s | ОТВЕТ %f", text, req.Task.TaskText, formula.Expression, req.Task.Result)},
-		{Role: mistral.RoleUser, Content: req.Text},
-	}, nil)
-	if err != nil {
-		logger.Lg().Infof("err: %v", err)
-		return c.JSON(http.StatusInternalServerError, "err")
+	if req.Text == "" {
+		resp, err = mh.client.Chat("mistral-large-latest", []mistral.ChatMessage{
+			{Role: mistral.RoleSystem, Content: fmt.Sprintf(" СЛЕДЮЩИЙ ПРОМПТ %s | ЗАДАЧА: %s | НЕОБХОДИМАЯ ФОРМУЛА:  %s | ОТВЕТ %f", text, req.Task.TaskText, formula.Expression, req.Task.Result)},
+			{Role: mistral.RoleUser, Content: req.Text},
+		}, nil)
+		if err != nil {
+			logger.Lg().Infof("err: %v", err)
+			return c.JSON(http.StatusInternalServerError, "err")
+		}
+	} else {
+		resp, err = mh.client.Chat("mistral-large-latest", []mistral.ChatMessage{
+			{Role: mistral.RoleSystem, Content: fmt.Sprintf("Сообщение юзера: %s | ЕСЛИ ВОПРОС ЮЗЕРА НИКАК НЕ СВЯЗАН С ЗАДАЧЕЙ, ИГРОРИРУЙ ЗАДАЧУ. Задача, которую вы обсуждаете: %s", req.Text, req.Task)},
+			{Role: mistral.RoleUser, Content: req.Text},
+		}, nil)
+		if err != nil {
+			logger.Lg().Infof("err: %v", err)
+			return c.JSON(http.StatusInternalServerError, "err")
+		}
 	}
 
 	err = mh.repo.AddMessage(dto.NewMessageDto{
