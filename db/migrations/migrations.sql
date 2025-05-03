@@ -62,3 +62,12 @@ CREATE table if not exists tasks(
     result float
 
 );
+
+CREATE table if not exists conversations(
+    id uuid primary key,
+    user_id uuid
+        constraint conversation_user_fk
+            references users(id),
+    messages text ARRAY,
+    createdAt timestamp with time zone default now()
+)

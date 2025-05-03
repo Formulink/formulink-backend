@@ -4,30 +4,33 @@ import (
 	"database/sql"
 	"formulink-backend/internal/config"
 	"formulink-backend/internal/service/handler"
+	"formulink-backend/internal/service/handler/conversations"
 	"github.com/labstack/echo/v4"
 	"github.com/redis/go-redis/v9"
 	"net/http"
 )
 
 type Service struct {
-	db             *sql.DB
-	redis          *redis.Client
-	authHandler    *handler.AuthHandler
-	formulaHandler *handler.FormulaHandler
-	sectionHandler *handler.SectionHandler
-	taskHandler    *handler.TaskHandler
-	mistralHandler *handler.MistralHandler
+	db                  *sql.DB
+	redis               *redis.Client
+	authHandler         *handler.AuthHandler
+	formulaHandler      *handler.FormulaHandler
+	sectionHandler      *handler.SectionHandler
+	taskHandler         *handler.TaskHandler
+	mistralHandler      *handler.MistralHandler
+	conversationHandler *conversations.ConversationHandler
 }
 
 func NewService(db *sql.DB, redis *redis.Client, cfg *config.MainConfig) *Service {
 	return &Service{
-		db:             db,
-		redis:          redis,
-		authHandler:    handler.NewAuthHandler(db),
-		formulaHandler: handler.NewFormulaHandler(db, redis),
-		sectionHandler: handler.NewSectionHandler(db, redis),
-		taskHandler:    handler.NewTaskHandler(db, redis),
-		mistralHandler: handler.NewMistralHandler(db, redis, cfg.MistralApiKey),
+		db:                  db,
+		redis:               redis,
+		authHandler:         handler.NewAuthHandler(db),
+		formulaHandler:      handler.NewFormulaHandler(db, redis),
+		sectionHandler:      handler.NewSectionHandler(db, redis),
+		taskHandler:         handler.NewTaskHandler(db, redis),
+		mistralHandler:      handler.NewMistralHandler(db, redis, cfg.MistralApiKey),
+		conversationHandler: conversations.NewConversationHandler(db),
 	}
 }
 
@@ -82,4 +85,26 @@ func (s *Service) MistralChat(c echo.Context) error {
 // other
 func (s *Service) Hello(ctx echo.Context) error {
 	return ctx.String(http.StatusOK, "( ´ ꒳ ` )")
+}
+
+// messages
+
+func (s *Service) CreateNewConversation(c echo.Context) error {
+	return s.conversationHandler.CreateNewConversation(c)
+}
+
+func (s *Service) GetConversation(c echo.Context) error {
+	return s.conversationHandler.GetConversation(c)
+}
+
+func (s *Service) GetAllConversations(c echo.Context) error {
+	return s.conversationHandler.GetAllConversations(c)
+}
+
+func (s *Service) AddMessage(c echo.Context) error {
+	return s.conversationHandler.AddMessage(c)
+}
+
+func (s *Service) DeleteConversation(c echo.Context) error {
+	return s.conversationHandler.DeleteConversation(c)
 }

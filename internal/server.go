@@ -47,6 +47,13 @@ func configureServer(s *Server) {
 	//neuro
 	e.POST("/ai", s.service.MistralChat)
 
+	//messages
+	e.POST("/conversation/new", s.service.CreateNewConversation)
+	e.GET("/conversation/:id", s.service.GetConversation)
+	e.GET("/conversations/:user_id", s.service.GetAllConversations)
+	e.POST("/conversation/message", s.service.AddMessage)
+	e.DELETE("/conversation/:id", s.service.DeleteConversation)
+
 	//CORS
 	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowOrigins: []string{
@@ -54,6 +61,9 @@ func configureServer(s *Server) {
 			"https://localhost:5173",
 			"http://localhost:5174",
 			"https://localhost:5174",
+			"0886-5-104-75-74.ngrok-free.app",
+			"https://0886-5-104-75-74.ngrok-free.app",
+			"http://0886-5-104-75-74.ngrok-free.app",
 		},
 		AllowHeaders: []string{"*"},
 	}))

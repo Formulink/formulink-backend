@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"formulink-backend/internal/dto"
 	"formulink-backend/internal/model"
+	"formulink-backend/internal/service/handler/conversations"
 	"formulink-backend/pkg/logger"
 	mistral2 "formulink-backend/pkg/mistral"
 	"github.com/gage-technologies/mistral-go"
@@ -19,6 +20,7 @@ type MistralHandler struct {
 	db     *sql.DB
 	redis  *redis.Client
 	client *mistral.MistralClient
+	repo   *conversations.ConversationRepository
 }
 
 func NewMistralHandler(_db *sql.DB, _redis *redis.Client, apiKey string) *MistralHandler {
@@ -26,10 +28,11 @@ func NewMistralHandler(_db *sql.DB, _redis *redis.Client, apiKey string) *Mistra
 		db:     _db,
 		redis:  _redis,
 		client: mistral2.CreateMistralClient(apiKey),
+		repo:   conversations.NewConversationRepository(_db),
 	}
 }
 
-const text string = "НА РУССКОМ ЯЗЫКЕ Ты - профессиональный учитель по физике. Ты должен ее решить, тщательно объяснив используемые методы. Однако ты ОБЯЗАТЕЛЬНО должен использовать приведенную ниже формулу для решения этой задачи. Ответ так же будет упомянут ниже для отсутствия дизинформации. Структурируй свой ответ.\n\n"
+var text string = "НА РУССКОМ ЯЗЫКЕ Ты - профессиональный учитель по физике. Тебе могут дать задачу(НЕ ОБЯЗАТЕЛЬНО), ты должен ее решить, тщательно объяснив используемые методы. Однако ты ОБЯЗАТЕЛЬНО должен использовать приведенную ниже формулу для решения этой задачи. Ответ так же будет упомянут ниже для отсутствия дизинформации. Структурируй свой ответ.\n\n"
 
 func (mh *MistralHandler) Chat(c echo.Context) error {
 	var req dto.MistralChatRequest
@@ -37,7 +40,7 @@ func (mh *MistralHandler) Chat(c echo.Context) error {
 	err := c.Bind(&req)
 	if err != nil {
 		logger.Lg().Infof("err: %v", err)
-		return c.JSON(http.StatusBadRequest, "err1")
+		return c.JSON(http.StatusBadRequest, "err")
 	}
 
 	formula, err := mh.getSingleFormula(req.Task.FormulaId)
@@ -52,28 +55,17 @@ func (mh *MistralHandler) Chat(c echo.Context) error {
 	}, nil)
 	if err != nil {
 		logger.Lg().Infof("err: %v", err)
-		return c.JSON(http.StatusInternalServerError, "err3")
+		return c.JSON(http.StatusInternalServerError, "err")
 	}
 
-	return c.JSON(http.StatusOK, resp)
-}
+	err = mh.repo.AddMessage(dto.NewMessageDto{
+		UserId:         req.UserId,
+		ConversationId: req.ConversationId,
+		Message:        resp.Choices[0].Message.Content,
+	})
 
-//func (mh *MistralHandler) getSingleTask(id uuid.UUID) (model.Task, error) {
-//	var task model.Task
-//
-//	query := `SELECT * from tasks where id = $1`
-//	row := mh.db.QueryRow(query, id)
-//	if err := row.Scan(
-//		&task.Id,
-//		&task.FormulaId,
-//		&task.Difficulty,
-//		&task.TaskText,
-//		&task.Result,
-//	); err != nil {
-//		return model.Task{}, err
-//	}
-//	return task, nil
-//}
+	return c.JSON(http.StatusOK, resp.Choices[0].Message.Content)
+}
 
 func (mh *MistralHandler) getSingleFormula(id uuid.UUID) (model.Formula, error) {
 	var formula model.Formula

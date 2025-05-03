@@ -36,7 +36,7 @@ func (th *TaskHandler) GetTasksByFormulaId(c echo.Context) error {
 
 	for rows.Next() {
 		var task model.Task
-		if err := rows.Scan(
+		if err = rows.Scan(
 			&task.Id,
 			&task.FormulaId,
 			&task.Difficulty,
