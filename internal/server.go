@@ -27,7 +27,7 @@ func configureServer(s *Server) {
 	e.GET("/", s.service.Hello)
 
 	//auth
-	e.GET("/auth", s.service.Auth)
+	e.POST("/auth", s.service.Auth)
 
 	//sections
 	e.GET("/sections", s.service.GetSections)
@@ -62,8 +62,7 @@ func configureServer(s *Server) {
 			"http://localhost:5174",
 			"https://localhost:5174",
 			"0886-5-104-75-74.ngrok-free.app",
-			"https://0886-5-104-75-74.ngrok-free.app",
-			"http://0886-5-104-75-74.ngrok-free.app",
+			"https://73cb-5-104-75-74.ngrok-free.app",
 		},
 		AllowHeaders: []string{"*"},
 	}))

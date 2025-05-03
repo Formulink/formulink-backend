@@ -8,6 +8,5 @@ type CreateUserRequest struct {
 }
 
 type CreateUserResponse struct {
-	Id       uuid.UUID `json:"id"`
-	HaveData bool      `json:"have_data"`
+	Id uuid.UUID `json:"id"`
 }

@@ -1,10 +1,13 @@
 package model
 
-import "time"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type User struct {
-	ID           int       `json:"id"`
-	TelegramId   int       `json:"telegram_id"`
+	ID           uuid.UUID `json:"id"`
+	TelegramID   int       `json:"telegram_id"`
 	Username     string    `json:"username"`
 	RegisteredAt time.Time `json:"registered_at"`
 }
