@@ -1,6 +1,9 @@
 package model
 
-import "github.com/google/uuid"
+import (
+	"github.com/google/uuid"
+	"time"
+)
 
 type Formula struct {
 	Id          uuid.UUID `json:"id"`
@@ -15,4 +18,5 @@ type Formula struct {
 type FormulaLike struct {
 	UserID    uuid.UUID `json:"user_id" `
 	FormulaID uuid.UUID `json:"formula_id"`
+	CreatedAt time.Time `json:"created_at"`
 }

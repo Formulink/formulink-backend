@@ -6,6 +6,7 @@ import (
 	"formulink-backend/internal/service/handler"
 	handler2 "formulink-backend/internal/service/handler/auth"
 	"formulink-backend/internal/service/handler/conversations"
+	"formulink-backend/internal/service/handler/formulas"
 	"github.com/labstack/echo/v4"
 	"github.com/redis/go-redis/v9"
 	"net/http"
@@ -15,7 +16,8 @@ type Service struct {
 	db                  *sql.DB
 	redis               *redis.Client
 	authHandler         *handler2.AuthHandler
-	formulaHandler      *handler.FormulaHandler
+	formulaHandler      *formulas.FormulaHandler
+	formulaLikeHandler  *formulas.FormulaLikesHandler
 	sectionHandler      *handler.SectionHandler
 	taskHandler         *handler.TaskHandler
 	mistralHandler      *handler.MistralHandler
@@ -27,7 +29,8 @@ func NewService(db *sql.DB, redis *redis.Client, cfg *config.MainConfig) *Servic
 		db:                  db,
 		redis:               redis,
 		authHandler:         handler2.NewAuthHandler(handler2.NewUserService(db)),
-		formulaHandler:      handler.NewFormulaHandler(db, redis),
+		formulaHandler:      formulas.NewFormulaHandler(db, redis),
+		formulaLikeHandler:  formulas.NewFormulaLikesHandler(db),
 		sectionHandler:      handler.NewSectionHandler(db, redis),
 		taskHandler:         handler.NewTaskHandler(db, redis),
 		mistralHandler:      handler.NewMistralHandler(db, redis, cfg.MistralApiKey),
@@ -68,6 +71,19 @@ func (s *Service) GetFormulaById(c echo.Context) error {
 
 func (s *Service) GetFormulaOfTheDay(c echo.Context) error {
 	return s.formulaHandler.GetFormulaOfTheDay(c)
+}
+
+// likes functions
+func (s *Service) HandleLike(c echo.Context) error {
+	return s.formulaLikeHandler.HandleLike(c)
+}
+
+func (s *Service) GetStatus(c echo.Context) error {
+	return s.formulaLikeHandler.GetStatus(c)
+}
+
+func (s *Service) GetAllLikedFormulas(c echo.Context) error {
+	return s.formulaLikeHandler.GetAllLikedFormulas(c)
 }
 
 // tasks

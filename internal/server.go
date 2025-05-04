@@ -40,6 +40,11 @@ func configureServer(s *Server) {
 	e.GET("/formulas/fday", s.service.GetFormulaOfTheDay)
 	e.GET("/formulas/all", s.service.GetAllFormulas)
 
+	//likes
+	e.POST("/like", s.service.HandleLike)
+	e.POST("/like-status", s.service.GetStatus)
+	e.GET("/liked-formulas/:user_id", s.service.GetAllLikedFormulas)
+
 	//task
 	e.GET("/tasks/:id", s.service.GetTasksByFormulaId)
 	e.GET("task/:id", s.service.GetTaskById)
