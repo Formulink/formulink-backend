@@ -4,7 +4,7 @@ import (
 	"database/sql"
 	"formulink-backend/internal/config"
 	"formulink-backend/internal/service/handler"
-	"formulink-backend/internal/service/handler/auth"
+	handler2 "formulink-backend/internal/service/handler/auth"
 	"formulink-backend/internal/service/handler/conversations"
 	"github.com/labstack/echo/v4"
 	"github.com/redis/go-redis/v9"
@@ -14,7 +14,7 @@ import (
 type Service struct {
 	db                  *sql.DB
 	redis               *redis.Client
-	authHandler         *auth.AuthHandler
+	authHandler         *handler2.AuthHandler
 	formulaHandler      *handler.FormulaHandler
 	sectionHandler      *handler.SectionHandler
 	taskHandler         *handler.TaskHandler
@@ -26,7 +26,7 @@ func NewService(db *sql.DB, redis *redis.Client, cfg *config.MainConfig) *Servic
 	return &Service{
 		db:                  db,
 		redis:               redis,
-		authHandler:         auth.NewAuthHandler(db),
+		authHandler:         handler2.NewAuthHandler(handler2.NewUserService(db)),
 		formulaHandler:      handler.NewFormulaHandler(db, redis),
 		sectionHandler:      handler.NewSectionHandler(db, redis),
 		taskHandler:         handler.NewTaskHandler(db, redis),

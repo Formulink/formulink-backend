@@ -45,6 +45,15 @@ func (mh *MistralHandler) Chat(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "err")
 	}
 
+	err = mh.repo.AddMessage(dto.NewMessageDto{
+		UserId:         req.UserId,
+		ConversationId: req.ConversationId,
+		Message:        req.Text,
+	})
+	if err != nil {
+		logger.Lg().Logf(0, "can't add user's message to conversation | err: %v", err)
+	}
+
 	formula, err := mh.getSingleFormula(req.Task.FormulaId)
 	if err != nil {
 		logger.Lg().Infof("err: %v", err)
