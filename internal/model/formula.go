@@ -13,6 +13,8 @@ type Formula struct {
 	Expression  string    `json:"expression"`
 	Parameters  []string  `json:"parameters"`
 	Difficulty  int8      `json:"difficulty"`
+	VideoLink   string    `json:"video_link"`
+	VideoName   string    `json:"video_name"`
 }
 
 type FormulaLike struct {

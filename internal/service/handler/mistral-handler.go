@@ -101,6 +101,8 @@ func (mh *MistralHandler) getSingleFormula(id uuid.UUID) (model.Formula, error) 
 		&formula.Expression,
 		pq.Array(&formula.Parameters),
 		&formula.Difficulty,
+		&formula.VideoLink,
+		&formula.VideoName,
 	); err != nil {
 		logger.Lg().Infof("err: %v", err)
 		return model.Formula{}, err

@@ -107,6 +107,8 @@ func (fh *FormulaLikesHandler) GetAllLikedFormulas(c echo.Context) error {
 			&formula.Expression,
 			pq.Array(&formula.Parameters),
 			&formula.Difficulty,
+			&formula.VideoLink,
+			&formula.VideoName,
 		); err != nil {
 			logger.Lg().Logf(0, "err: %v", err)
 			return c.JSON(http.StatusInternalServerError, err)

@@ -53,6 +53,8 @@ func (fh *FormulaHandler) GetAllFormulas(c echo.Context) error {
 				&formula.Expression,
 				pq.Array(&formula.Parameters),
 				&formula.Difficulty,
+				&formula.VideoLink,
+				&formula.VideoName,
 			)
 			if err != nil {
 				return c.JSON(http.StatusInternalServerError, err)
@@ -99,6 +101,8 @@ func (fh *FormulaHandler) GetFormulasBySectionId(c echo.Context) error {
 			&formula.Expression,
 			pq.Array(&formula.Parameters),
 			&formula.Difficulty,
+			&formula.VideoLink,
+			&formula.VideoName,
 		); err != nil {
 			return c.JSON(http.StatusInternalServerError, "can't parse db data to model.Formula")
 		}
@@ -132,6 +136,8 @@ func (fh *FormulaHandler) GetFormulaById(c echo.Context) error {
 		&formula.Expression,
 		pq.Array(&formula.Parameters),
 		&formula.Difficulty,
+		&formula.VideoLink,
+		&formula.VideoName,
 	)
 
 	if errors.Is(err, sql.ErrNoRows) {
@@ -185,6 +191,8 @@ func (fh *FormulaHandler) setRandomFormula() error {
 		&formula.Expression,
 		pq.Array(&formula.Parameters),
 		&formula.Difficulty,
+		&formula.VideoLink,
+		&formula.VideoName,
 	)
 	if err != nil {
 		logger.Lg().Logf(zapcore.InfoLevel, "problem is here (get rows)")
