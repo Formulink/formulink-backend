@@ -13,6 +13,7 @@ services:
     networks:
       - main-network
     restart: unless-stopped
+    command: [ "postgres", "-c", "listen_addresses=*" ]
     healthcheck:
       test: [ "CMD-SHELL", "pg_isready -U root -d postgres" ]
       interval: 5s
@@ -41,7 +42,7 @@ services:
       context: .
       dockerfile: Dockerfile
     container_name: formulink_server_container
-    networks: 
+    networks:
       - main-network
     depends_on:
       redis:
@@ -49,7 +50,7 @@ services:
       postgres:
         condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8081"]
+      test: ["CMD", "curl", "-f", "http://localhost:8082"]
       interval: 5s
       timeout: 5s
       retries: 5

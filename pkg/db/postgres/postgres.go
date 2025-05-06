@@ -4,7 +4,6 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
-
 	"github.com/golang-migrate/migrate"
 	_ "github.com/golang-migrate/migrate/database/postgres"
 	_ "github.com/golang-migrate/migrate/source/file"
@@ -29,7 +28,15 @@ func New(config Config) (*sql.DB, error) {
 		config.Port,
 		config.Database,
 	)
+
 	db, err := sql.Open("postgres", connStr)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := db.Ping(); err != nil {
+		return nil, err
+	}
 
 	connStr2 := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable&search_path=%s",
 		config.Username,
@@ -42,12 +49,11 @@ func New(config Config) (*sql.DB, error) {
 
 	m, err := migrate.New("file://db/migrations", connStr2)
 	if err != nil && !errors.Is(err, migrate.ErrNoChange) {
-		return nil, fmt.Errorf("can't create migration instance: %w", err)
+		return nil, err
 	}
 	if err = m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
-		return nil, fmt.Errorf("can't apply migrations: %w", err)
+		return nil, err
 	}
 
 	return db, nil
 }
-

@@ -75,6 +75,7 @@ func configureServer(s *Server) {
 	s.e = e
 }
 
-func (s *Server) Start() {
-	s.e.Logger.Fatal(s.e.Start(":8082"))
+func (s *Server) Start() error {
+	err := s.e.Start(":8082")
+	return err
 }
