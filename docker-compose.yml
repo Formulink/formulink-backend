@@ -36,11 +36,13 @@ services:
 
   main-service:
     ports:
-      - "8081:8081"
+      - "8082:8082"
     build:
       context: .
       dockerfile: Dockerfile
     container_name: formulink_server_container
+    networks: 
+      - main-network
     depends_on:
       redis:
         condition: service_healthy

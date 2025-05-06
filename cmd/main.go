@@ -18,7 +18,7 @@ func main() {
 		logger.Lg().Fatalf("err: %v", err)
 	}
 
-	pgConn, err := postgres.NewPostgres(cfg.POSTGRES)
+	pgConn, err := postgres.New(cfg.POSTGRES)
 	redisClient := redis.NewRedisConn(cfg.REDIS)
 
 	mistralClient := mistral.CreateMistralClient(cfg.MistralApiKey)
