@@ -128,7 +128,7 @@ func (fh *FormulaHandler) GetFormulaById(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "id is invalid format")
 	}
 
-	query := `SELECT id, section_id, name, description, expression, parameters, difficulty FROM formulas WHERE id = $1`
+	query := `SELECT * FROM formulas WHERE id = $1`
 	row := fh.db.QueryRow(query, id)
 	err = row.Scan(
 		&formula.Id,
@@ -180,7 +180,7 @@ func (fh *FormulaHandler) GetFormulaOfTheDay(c echo.Context) error {
 func (fh *FormulaHandler) setRandomFormula() error {
 	var formula model.Formula
 
-	query := `SELECT id, section_id, name, description, expression, parameters, difficulty 
+	query := `SELECT *
           FROM formulas 
           ORDER BY RANDOM() 
           LIMIT 1`
