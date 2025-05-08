@@ -57,6 +57,7 @@ func (fh *FormulaHandler) GetAllFormulas(c echo.Context) error {
 				&formula.VideoName,
 			)
 			if err != nil {
+				logger.Lg().Logf(0, "can't parse data form db | err: %v", err)
 				return c.JSON(http.StatusInternalServerError, err)
 			}
 			formulas = append(formulas, formula)
@@ -85,7 +86,7 @@ func (fh *FormulaHandler) GetFormulasBySectionId(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "id is missing")
 	}
 
-	query := `SELECT id, section_id, name,  description, expression, parameters, difficulty from formulas WHERE section_id = $1`
+	query := `SELECT * from formulas WHERE section_id = $1`
 	rows, err := fh.db.Query(query, id)
 	if err != nil {
 		return c.JSON(http.StatusOK, "there no formulas by this section ID")
@@ -104,6 +105,7 @@ func (fh *FormulaHandler) GetFormulasBySectionId(c echo.Context) error {
 			&formula.VideoLink,
 			&formula.VideoName,
 		); err != nil {
+			logger.Lg().Logf(0, "can't parse data form db | err: %v", err)
 			return c.JSON(http.StatusInternalServerError, "can't parse db data to model.Formula")
 		}
 		formulas = append(formulas, formula)
@@ -126,7 +128,7 @@ func (fh *FormulaHandler) GetFormulaById(c echo.Context) error {
 		return c.JSON(http.StatusBadRequest, "id is invalid format")
 	}
 
-	query := `SELECT id, section_id, name, description, expression, parameters, difficulty FROM formulas WHERE id = $1`
+	query := `SELECT * FROM formulas WHERE id = $1`
 	row := fh.db.QueryRow(query, id)
 	err = row.Scan(
 		&formula.Id,
@@ -141,6 +143,7 @@ func (fh *FormulaHandler) GetFormulaById(c echo.Context) error {
 	)
 
 	if errors.Is(err, sql.ErrNoRows) {
+		logger.Lg().Logf(0, "can't parse data form db | err: %v", err)
 		return c.JSON(http.StatusNotFound, "formula doesn't exist")
 	}
 
@@ -177,7 +180,7 @@ func (fh *FormulaHandler) GetFormulaOfTheDay(c echo.Context) error {
 func (fh *FormulaHandler) setRandomFormula() error {
 	var formula model.Formula
 
-	query := `SELECT id, section_id, name, description, expression, parameters, difficulty 
+	query := `SELECT *
           FROM formulas 
           ORDER BY RANDOM() 
           LIMIT 1`
@@ -212,3 +215,4 @@ func (fh *FormulaHandler) setRandomFormula() error {
 	logger.Lg().Logf(zapcore.InfoLevel, "item succesfully updated in redis")
 	return nil
 }
+
