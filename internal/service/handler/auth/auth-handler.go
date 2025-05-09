@@ -37,8 +37,9 @@ func (ah *AuthHandler) Auth(c echo.Context) error {
 
 	if user != nil {
 		logger.Lg().Logf(0, "user succesfully logged in")
-		return c.JSON(http.StatusOK, map[string]string{
-			"user_id": user.ID.String(),
+		return c.JSON(http.StatusOK, map[string]any{
+			"user_id":         user.ID.String(),
+			"need_onboarding": user.NeedOnboarding,
 		})
 	}
 
@@ -51,8 +52,9 @@ func (ah *AuthHandler) Auth(c echo.Context) error {
 	logger.Lg().Logf(0, "ISE | err: %v", err)
 
 	logger.Lg().Logf(0, "user succesfully created")
-	return c.JSON(http.StatusCreated, map[string]string{
-		"user_id": newUser.ID.String(),
+	return c.JSON(http.StatusCreated, map[string]any{
+		"user_id":         newUser.ID.String(),
+		"need_onboarding": newUser.NeedOnboarding,
 	})
 }
 
