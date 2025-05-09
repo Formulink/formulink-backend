@@ -20,7 +20,7 @@ func NewUserService(db *sql.DB) *UserService {
 func (s *UserService) GetByTelegramID(telegramID int) (*model.User, error) {
 	var user model.User
 	row := s.db.QueryRow("SELECT * FROM users WHERE telegramid = $1", telegramID)
-	err := row.Scan(&user.ID, &user.TelegramID, &user.Username)
+	err := row.Scan(&user.ID, &user.TelegramID, &user.Username, &user.NeedOnboarding)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, nil
