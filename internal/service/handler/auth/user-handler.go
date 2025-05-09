@@ -47,12 +47,17 @@ func (s *UserService) CreateUser(req dto.CreateUserRequest) (*model.User, error)
 
 func (s *UserService) SetNeedOnboardingFalse(tgId int) error {
 	query := `UPDATE users 
-			SET need_onboarding = true
+			SET need_onboarding = false
 			WHERE telegramid = $1
 		`
-	if _, err := s.db.Exec(query, tgId); err != nil {
+	logger.Lg().Logf(0, "tgid: %d", tgId)
+
+	n, err := s.db.Exec(query, tgId)
+	if err != nil {
 		logger.Lg().Logf(0, "can't update need_onboarding to false | err: %v", err)
 		return err
 	}
+	logger.Lg().Logf(0, "n: %v", n)
+
 	return nil
 }
