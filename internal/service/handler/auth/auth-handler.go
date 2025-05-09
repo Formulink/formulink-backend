@@ -59,13 +59,13 @@ func (ah *AuthHandler) Auth(c echo.Context) error {
 }
 
 func (ah *AuthHandler) SetOnboardingFalse(c echo.Context) error {
-	var tgId int
-	if err := c.Bind(&tgId); err != nil {
+	var req dto.OnboardingRequest
+	if err := c.Bind(&req); err != nil {
 		logger.Lg().Logf(0, "invalid request, err: %v", err)
 		return c.JSON(http.StatusBadRequest, err)
 	}
 
-	if err := ah.userService.SetNeedOnboardingFalse(tgId); err != nil {
+	if err := ah.userService.SetNeedOnboardingFalse(req.TelegramId); err != nil {
 		return c.NoContent(http.StatusNotFound)
 	}
 	return c.NoContent(http.StatusOK)
