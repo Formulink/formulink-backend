@@ -47,6 +47,7 @@ func configureServer(s *Server) {
 
 	//auth
 	e.POST("/auth", s.service.Auth)
+	e.POST("/onboarding-requirement", s.service.UpdateOnboarding)
 
 	//sections
 	e.GET("/sections", s.service.GetSections)
@@ -147,4 +148,3 @@ func (s *Server) Start() error {
 	err := s.e.Start(":8082")
 	return err
 }
-

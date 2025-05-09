@@ -55,3 +55,16 @@ func (ah *AuthHandler) Auth(c echo.Context) error {
 		"user_id": newUser.ID.String(),
 	})
 }
+
+func (ah *AuthHandler) SetOnboardingFalse(c echo.Context) error {
+	var tgId int
+	if err := c.Bind(&tgId); err != nil {
+		logger.Lg().Logf(0, "invalid request, err: %v", err)
+		return c.JSON(http.StatusBadRequest, err)
+	}
+
+	if err := ah.userService.SetNeedOnboardingFalse(tgId); err != nil {
+		return c.NoContent(http.StatusNotFound)
+	}
+	return c.NoContent(http.StatusOK)
+}

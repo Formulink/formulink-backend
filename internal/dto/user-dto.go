@@ -10,3 +10,7 @@ type CreateUserRequest struct {
 type CreateUserResponse struct {
 	Id uuid.UUID `json:"id"`
 }
+
+type OnboardingRequest struct {
+	TelegramId int `json:"telegram_id"`
+}

@@ -43,6 +43,10 @@ func (s *Service) Auth(c echo.Context) error {
 	return s.authHandler.Auth(c)
 }
 
+func (s *Service) UpdateOnboarding(c echo.Context) error {
+	return s.authHandler.SetOnboardingFalse(c)
+}
+
 // section functions
 func (s *Service) GetSections(c echo.Context) error {
 	return s.sectionHandler.GetSections(c)
