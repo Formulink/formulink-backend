@@ -215,3 +215,4 @@ func (fh *FormulaHandler) setRandomFormula() error {
 	logger.Lg().Logf(zapcore.InfoLevel, "item succesfully updated in redis")
 	return nil
 }
+

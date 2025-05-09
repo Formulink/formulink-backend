@@ -41,6 +41,8 @@ func NewServer(db *sql.DB, redis *redis.Client, cfg *config.MainConfig) *Server 
 
 func configureServer(s *Server) {
 	e := echo.New()
+	e.Use(middleware.CORS())
+
 	e.GET("/", s.service.Hello)
 
 	//auth
@@ -137,17 +139,6 @@ func configureServer(s *Server) {
 	})
 
 	//CORS
-	e.Use(middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowOrigins: []string{
-			"http://localhost:5173",
-			"https://localhost:5173",
-			"http://localhost:5174",
-			"https://localhost:5174",
-			"https://73cb-5-104-75-74.ngrok-free.app",
-			"https://redirect-counter.vercel.app",
-		},
-		AllowHeaders: []string{"*"},
-	}))
 
 	s.e = e
 }
@@ -156,3 +147,4 @@ func (s *Server) Start() error {
 	err := s.e.Start(":8082")
 	return err
 }
+
