@@ -24,7 +24,6 @@ type Config struct {
 }
 
 func New(config Config) (*sql.DB, error) {
-	// Формируем строку подключения
 	connStr := fmt.Sprintf("postgres://%s:%s@%s:%d/%s?sslmode=disable",
 		config.Username,
 		config.Password,
@@ -33,20 +32,17 @@ func New(config Config) (*sql.DB, error) {
 		config.Database,
 	)
 
-	// Открываем соединение с базой
 	db, err := sql.Open("postgres", connStr)
 	if err != nil {
 		logger.Lg().Logf(0, "can't open db | err: %v", err)
 		return nil, err
 	}
 
-	// Пингуем базу данных
 	if err := db.Ping(); err != nil {
 		logger.Lg().Logf(0, "can't ping db | err: %v", err)
 		return nil, err
 	}
 
-	// Создаем строку подключения с дополнительным параметром для схемы поиска
 	user := url.QueryEscape(config.Username)
 	pass := url.QueryEscape(config.Password)
 	schema := url.QueryEscape(config.SearchSchema)
@@ -60,20 +56,16 @@ func New(config Config) (*sql.DB, error) {
 		schema,
 	)
 
-	// Создаем объект миграции
 	m, err := migrate.New("file://db/migrations", connStr2)
 	if err != nil {
 		logger.Lg().Logf(0, "can't migrat6e db | err: %v", err)
 		return nil, err
 	}
 
-	// Выполняем миграции (если нет изменений, они не будут применены)
 	if err = m.Up(); err != nil && !errors.Is(err, migrate.ErrNoChange) {
 		logger.Lg().Logf(0, "can't migrate 2.0 db | err: %v", err)
 		return db, nil
 	}
 
-	// Возвращаем объект базы данных
 	return db, nil
 }
-

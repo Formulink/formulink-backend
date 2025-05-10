@@ -49,6 +49,10 @@ func configureServer(s *Server) {
 	e.POST("/auth", s.service.Auth)
 	e.POST("/onboarding-requirement", s.service.UpdateOnboarding)
 
+	//user-stasts
+	e.GET("/user/stats/:user_id", s.service.GetUserRecords)
+	e.POST("/user/stats/new", s.service.CreateNewRecord)
+
 	//sections
 	e.GET("/sections", s.service.GetSections)
 	e.GET("/:subject/sections", s.service.GetSectionsBySubjectId)

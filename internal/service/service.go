@@ -7,6 +7,7 @@ import (
 	handler2 "formulink-backend/internal/service/handler/auth"
 	"formulink-backend/internal/service/handler/conversations"
 	"formulink-backend/internal/service/handler/formulas"
+	"formulink-backend/internal/service/handler/user_stats"
 	"github.com/labstack/echo/v4"
 	"github.com/redis/go-redis/v9"
 	"net/http"
@@ -22,6 +23,7 @@ type Service struct {
 	taskHandler         *handler.TaskHandler
 	mistralHandler      *handler.MistralHandler
 	conversationHandler *conversations.ConversationHandler
+	userStatsHandler    *user_stats.UserStatsHandler
 }
 
 func NewService(db *sql.DB, redis *redis.Client, cfg *config.MainConfig) *Service {
@@ -35,6 +37,7 @@ func NewService(db *sql.DB, redis *redis.Client, cfg *config.MainConfig) *Servic
 		taskHandler:         handler.NewTaskHandler(db, redis),
 		mistralHandler:      handler.NewMistralHandler(db, redis, cfg.MistralApiKey),
 		conversationHandler: conversations.NewConversationHandler(db),
+		userStatsHandler:    user_stats.NewUserStatsHandler(db),
 	}
 }
 
@@ -45,6 +48,16 @@ func (s *Service) Auth(c echo.Context) error {
 
 func (s *Service) UpdateOnboarding(c echo.Context) error {
 	return s.authHandler.SetOnboardingFalse(c)
+}
+
+//user-stats
+
+func (s *Service) CreateNewRecord(c echo.Context) error {
+	return s.userStatsHandler.CreateNewRecord(c)
+}
+
+func (s *Service) GetUserRecords(c echo.Context) error {
+	return s.userStatsHandler.GetUserRecords(c)
 }
 
 // section functions

@@ -1,5 +1,4 @@
 
-
 FROM debian:bookworm-slim
 
 WORKDIR /app
@@ -17,4 +16,3 @@ RUN update-ca-certificates
 EXPOSE 8082
 
 CMD ["./service"]
-
