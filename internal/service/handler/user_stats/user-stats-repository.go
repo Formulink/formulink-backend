@@ -49,9 +49,9 @@ func (usr *UserStatsRepository) getUserStats(userId uuid.UUID) *[]model.UserStat
 			&s.Right,
 			&s.Fail,
 			&s.CompletedAt,
-		); err == nil && s.Fail != 0 && s.Right != 0 {
+		); err == nil {
 			stats = append(stats, s)
-		} else if err != nil {
+		} else {
 			logger.Lg().Logf(0, "ISE | err: %v", err)
 			return nil
 		}
